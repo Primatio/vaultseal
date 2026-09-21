@@ -1,0 +1,14 @@
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      # Tag pattern on pub.dev: {{version}}
+      # The first upload of 0.1.0 is manual. Later versions publish from this tag.
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  publish:
+    permissions:
+      id-token: write
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1

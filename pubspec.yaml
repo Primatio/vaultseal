@@ -1,0 +1,20 @@
+name: vaultseal
+description: Seal vault items under a vault key with AES-256-GCM and wrap that key to members with HPKE (X25519).
+version: 0.1.0
+repository: https://github.com/Primatio/vaultseal
+issue_tracker: https://github.com/Primatio/vaultseal/issues
+topics:
+  - cryptography
+  - encryption
+  - security
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  cryptography: ^2.9.0
+  meta: ^1.16.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

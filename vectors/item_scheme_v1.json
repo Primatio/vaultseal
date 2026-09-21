@@ -1,0 +1,18 @@
+{
+  "description": "scheme 1 item, AES-256-GCM via Python cryptography",
+  "vault_key": "4444444444444444444444444444444444444444444444444444444444444444",
+  "nonce": "0102030405060708090a0b0c",
+  "plaintext": "00112233fffe",
+  "vault_id": "vault-1",
+  "item_id": "item-1",
+  "purpose": 1,
+  "aad": "7661756c747365616c2d6974656d00077661756c742d3100066974656d2d3101",
+  "sealed_item": "010102030405060708090a0b0ccbcc62e143da7151396f43a39dd5de486377422f5be3",
+  "nist_cavp_gcmEncryptExtIV256_count0": {
+    "key": "b52c505a37d78eda5dd34f20c22540ea1b58963cf8e5bf8ffa85f9f2492505b4",
+    "nonce": "516c33929df5a3284ff463d7",
+    "plaintext": "",
+    "aad": "",
+    "ciphertext_and_tag": "bdc1ac884d332457a1d2664f168c76f0"
+  }
+}
