@@ -5,13 +5,13 @@ The server stores ciphertext only.
 
 This is the Dart package. The PyPI project named `vaultseal` is a different tool.
 
-Scheme 1 wire format is stable in 0.1.0. The Dart API can still change before 1.0.0.
+Scheme 1 wire format is stable since 0.1.0. Scheme 2 adds a hybrid wrap and does not change item bytes. The Dart API can still change before 1.0.0.
 
 ## Install
 
 ```yaml
 dependencies:
-  vaultseal: ^0.1.0
+  vaultseal: ^0.3.0
 ```
 
 ```dart
@@ -42,11 +42,17 @@ final opened = await openItem(sealed: sealed, vaultKey: key, context: item);
 
 Byte layout, limits, and error behavior are in [SPEC.md](SPEC.md).
 
+## Also in 0.3.0
+
+- `rotateVaultKey` opens the listed items, seals them under a new vault key, and wraps that key to the remaining members. The app stores the new blobs and drops the previous generation.
+- `wrapHybridVaultKey` wraps a vault key with ML-KEM-768 and X25519 (`KeyAgreementScheme.hybridMlKem768`). Items stay AES-256-GCM.
+- `sealSharePayload` seals an ephemeral share under a 32-byte DEK. The PIN stays in the app.
+
 ## Limits the app must honor
 
 - Rotate a vault key before 2^32 seals. Nonces are random and this library does not count them.
 - Plaintext longer than 8 MiB is rejected.
-- HPKE Base does not authenticate the sender. Bind each wrap to an authenticated membership record before trusting it. See [THREAT_MODEL.md](THREAT_MODEL.md).
+- Scheme 1 and scheme 2 wraps do not authenticate the sender. Bind each wrap to an authenticated membership record before trusting it. See [THREAT_MODEL.md](THREAT_MODEL.md).
 - `destroy()` zeroes the copy this library holds. That wipe is best-effort on the Dart VM.
 
 Report vulnerabilities through [SECURITY.md](SECURITY.md). Do not open a public issue that contains key material.

@@ -51,8 +51,8 @@ final class SealContext {
 
 /// Context bound into a vault-key wrap.
 ///
-/// [keyGeneration] starts at 1. A later rotation keeps scheme 1 and uses a new
-/// generation instead of a new scheme version.
+/// [keyGeneration] starts at 1. A later rotation keeps the wrap scheme and
+/// uses a new generation. Scheme 2 uses this same context.
 final class WrapContext {
   /// Creates a wrap context.
   ///
@@ -102,13 +102,46 @@ Uint8List encodeWrapAad({
   required int keyGeneration,
   required Uint8List recipientPublicKey,
 }) {
-  final vault = _utf8Id(vaultId, 'vaultId');
-  final generation = _generation(keyGeneration);
   if (recipientPublicKey.length != x25519KeyLength) {
     throw const VaultSealFormatException(
       'Member public key must be 32 bytes.',
     );
   }
+  return _encodeWrapLabel(
+    vaultId: vaultId,
+    keyGeneration: keyGeneration,
+    recipientPublicKey: recipientPublicKey,
+  );
+}
+
+/// Associated data for a scheme-2 hybrid wrap.
+///
+/// Same layout as [encodeWrapAad]. [recipientPublicKey] is the 1216-byte
+/// hybrid public key.
+Uint8List encodeHybridWrapAad({
+  required String vaultId,
+  required int keyGeneration,
+  required Uint8List recipientPublicKey,
+}) {
+  if (recipientPublicKey.length != hybridPublicKeyLength) {
+    throw const VaultSealFormatException(
+      'Hybrid member public key must be 1216 bytes.',
+    );
+  }
+  return _encodeWrapLabel(
+    vaultId: vaultId,
+    keyGeneration: keyGeneration,
+    recipientPublicKey: recipientPublicKey,
+  );
+}
+
+Uint8List _encodeWrapLabel({
+  required String vaultId,
+  required int keyGeneration,
+  required Uint8List recipientPublicKey,
+}) {
+  final vault = _utf8Id(vaultId, 'vaultId');
+  final generation = _generation(keyGeneration);
   final out = BytesBuilder()
     ..add(utf8.encode('vaultseal-wrap'))
     ..addByte((generation >> 24) & 0xff)

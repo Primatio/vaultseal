@@ -4,9 +4,10 @@
 
 | Version | Supported |
 |---------|-----------|
+| 0.3.x   | Yes       |
 | 0.1.x   | Yes       |
 
-Scheme 1 wire format is stable for 0.1.x. Report a bug that breaks that layout as a vulnerability.
+Scheme 1 wire format is stable. Scheme 2 wrap bytes are stable for 0.3.x. Report a bug that breaks either layout as a vulnerability.
 
 ## Reporting
 

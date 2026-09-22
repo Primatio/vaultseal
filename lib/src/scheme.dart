@@ -1,5 +1,28 @@
-/// Scheme 1: AES-256-GCM items and HPKE Base X25519 wraps.
+/// Item scheme and X25519 wrap scheme. The version byte of a sealed item and
+/// of a scheme-1 wrapped vault key.
 const int schemeVersion = 1;
+
+/// X25519 HPKE wrap. Same byte as [schemeVersion].
+const int x25519WrapScheme = 1;
+
+/// ML-KEM-768 + X25519 hybrid wrap. The version byte of a hybrid wrapped vault key.
+const int hybridWrapScheme = 2;
+
+/// How a vault key is wrapped to a member.
+enum KeyAgreementScheme {
+  /// HPKE Base with X25519. Wire version [x25519WrapScheme].
+  x25519(x25519WrapScheme),
+
+  /// ML-KEM-768 and X25519, combined with HKDF-SHA256. Wire version
+  /// [hybridWrapScheme].
+  hybridMlKem768(hybridWrapScheme);
+
+  /// Creates a scheme whose wrap version byte is [wrapScheme].
+  const KeyAgreementScheme(this.wrapScheme);
+
+  /// Version byte written at the start of a wrapped vault key.
+  final int wrapScheme;
+}
 
 /// Maximum item plaintext accepted by [sealItem], in bytes (8 MiB).
 const int maxPlaintextLength = 8388608;
@@ -19,6 +42,33 @@ const int tagLength = 16;
 /// X25519 public and private key length in bytes.
 const int x25519KeyLength = 32;
 
+/// ML-KEM-768 encapsulation key length in bytes (FIPS 203).
+const int mlKem768PublicKeyLength = 1184;
+
+/// ML-KEM-768 decapsulation key length in bytes (FIPS 203).
+const int mlKem768PrivateKeyLength = 2400;
+
+/// ML-KEM-768 ciphertext length in bytes (FIPS 203).
+const int mlKem768CiphertextLength = 1088;
+
+/// Hybrid member public key: X25519 public key followed by the ML-KEM-768
+/// encapsulation key.
+const int hybridPublicKeyLength = x25519KeyLength + mlKem768PublicKeyLength;
+
+/// Hybrid member private key: clamped X25519 scalar followed by the ML-KEM-768
+/// decapsulation key.
+const int hybridPrivateKeyLength = x25519KeyLength + mlKem768PrivateKeyLength;
+
+/// Byte length of every hybrid wrapped vault key.
+///
+/// `version || x25519 enc || ML-KEM ciphertext || nonce || vault key || tag`.
+const int hybridWrappedVaultKeyLength = 1 +
+    x25519KeyLength +
+    mlKem768CiphertextLength +
+    nonceLength +
+    vaultKeyLength +
+    tagLength;
+
 /// Shortest scheme-1 sealed item: version, nonce, empty ciphertext, tag.
 const int sealedItemMinLength = 1 + nonceLength + tagLength;
 
@@ -29,7 +79,7 @@ const int sealedItemMaxLength =
 /// Maximum UTF-8 length of a vault id or item id.
 const int maxIdentifierLength = 256;
 
-/// A blob or argument does not match scheme 1.
+/// A blob or argument does not match the vaultseal format.
 final class VaultSealFormatException implements Exception {
   /// Creates a format error.
   ///
